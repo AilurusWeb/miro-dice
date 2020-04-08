@@ -10,6 +10,7 @@
 /*
 || Utiliser Class
 || Utiliser TypeScript
+|| Utiliser Linter
 */
 
 
@@ -23,34 +24,36 @@ function getRolls (reply) {
   let rolls = extractRolls(reply)
   if(!rolls) return false
 
-  rolls = rolls.map( roll => {
-    return splitRollAndBonus(roll)
+  return rolls.map( roll => {
+    roll = splitRollAndBonus(roll)
+    return calcRoll(roll.dices, roll.bonus)
   })
-  console.log(rolls)
 }
 
 /**
  * Génère et calcul les valeurs d'un lancé de dé
- * @param  {String} roll String du lancé de dé
- * @param  {Int} sumBonus Somme des valeurs des bonus associées au jet
+ * @param  {String} dices String du lancé de dé
+ * @param  {Int} bonus Somme des valeurs des bonus associées au jet
  * @return {Object}  Object contenant les lancés de dé calculés
  */
-function calcRoll (roll, sumBonus) {
-  if (!roll) return false
-  let figures = roll.split(/d/gi).filter(x => x)
-  let occurence = figures[0]
+function calcRoll (dices, bonus) {
+  if (!dices) return false
+  let figures = dices.split(/d/gi).filter(x => x)
+  if (figures.length === 1) figures.unshift(1)
+  let occurence = figures[0] 
   let sides = figures[1]
-  let results = []
+  let rolls = []
   let sum = 0
-  for (let i = 0; i > occurence; i++) {
+  for (let i = 1; i <= occurence; i++) {
     let dice = Math.floor(Math.random() * sides) + 1
-    results.push({
+    rolls.push({
+      'side': sides,
       'dice': dice,
-      'bonus': sumBonus,
-      'sum':  dice + sumBonus
+      'bonus': bonus,
+      'value':  dice + bonus,
     })
   }
-  return results
+  return rolls
 }
 
 /**
@@ -70,7 +73,6 @@ function calcBonus (bonus) {
 }
 
 function splitRollAndBonus (roll) {
-  console.log(roll)
   let dices = roll.match(/(\d*?D\d+)/gi)[0]
   let bonus = roll.replace(dices, '')
   if (!bonus) bonus = 0
@@ -123,13 +125,33 @@ function extractRolls (reply) {
   return (rolls.length > 0)? rolls : false
 }
 
+function rollToString (roll) {
+  const config = showRollsDetails()
+  let reply = ""
+  if (!config) {
+    reply = `Total du lancé : ${roll.value}<br>`
+  }
+  else {
+    reply = `D${roll.side} : ${roll.dice} (dé) + ${roll.bonus} (bonus) = ${roll.value}<br>`
+  }
+  return reply
+}
+
+function rollsToString (rolls) {
+  
+}
+
 function inputValidation () {
   if (inputRoll.value.length <= 0) return false
   return true
 }
 
 function setReply (username, reply) {
-  let calc = getRolls(reply)
+  let rolls = getRolls(reply)
+  reply = rolls.map( rolls => {
+    return rolls.map (roll => rollToString(roll))
+  })
+  console.log(reply)
   let divReply = document.createElement("div");
       divReply.className = "rolldice__reply";
       divReply.innerHTML = `<span class="rolldice__reply-username">${username}</span>
@@ -154,4 +176,11 @@ inputRoll.addEventListener("keydown", (event) => {
 
 function showRollsByName() {
 
+}
+
+function showRollsDetails() {
+  // Que la somme (sans détail)
+  // La somme = valeur du dé + bonus
+  // Sous forme de tableau
+  return true
 }
