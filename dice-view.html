@@ -4,28 +4,35 @@
     <meta charset="utf-8">
     <script src="https://miro.com/app/static/sdk.1.1.js"></script>
     <link rel="stylesheet" type="text/css" href="https://miro.com/app/static/styles.1.0.css"/>
-    <style type="text/css"></style>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 <body>
     <div class="sidebar__content">
-        <div id="rolldice-container">
-            <div class="rolldice__header"><h2>Widget Roll Dice</h2></div>
-            <div class="rolldice__main">
-              <div id="repliesContain" class="rolldice__replies">
-              <!--
-                <div class="rolldice__reply">
-                  <span class="rolldice__reply-username">Khü</span>
-                  <span class="rolldice__reply-text">tyftry  fytfytrf yèugugf</span>
+        <div id="dicetray" class="dicetray">
+          <div class="dicetray__header">
+            <h2>Lanceur de dés</h2>
+          </div>
+          <div class="dicetray__chat">
+            <div id="dicetrayReplies" class="dicetray__replies">
+              <!-- Replies -->
+              <div class="dicetray__reply">
+                <div class="dicetray__reply-username">Khü</div>
+                <div class="dicetray__reply-rolls">
+                  <div class="dicetray__roll">
+                    <span class="c-side">D6</span>
+                    <span class="c-result"><b>6</b> <small>(dé)</small> + <b>0</b> <small>(bonus)</small> = <b>6</b></span>
+                  </div>
                 </div>
-              -->
               </div>
-              <div class="rolldice__form">
-                <div class="miro-input-group miro-input-group--small">
-                  <input type="text" id="inputRoll" class="miro-input miro-input--primary" value="" placeholder="Ecrire ici...">
-                  <button id="buttonRoll" class="miro-btn miro-btn--primary">Répondre</button>
-                </div>
+              <!-- Replies -->
+            </div>
+            <div class="dicetray__form">
+              <div class="dicetray__toreply miro-input-group miro-input-group--small">
+                <input type="text" id="inputReply" class="miro-input miro-input--primary" value="" placeholder="Ecrire ici...">
+                <button id="buttonReply" class="miro-btn miro-btn--primary">Répondre</button>
               </div>
             </div>
+          </div>
         </div>
     </div>
 

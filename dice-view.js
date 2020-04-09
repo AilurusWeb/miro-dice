@@ -15,10 +15,10 @@
 
 
 /* Elements */
-const inputRoll = document.getElementById('inputRoll');
-const buttonRoll = document.getElementById('buttonRoll');
+const inputReply = document.getElementById('inputReply');
+const buttonReply = document.getElementById('buttonReply');
 
-let divReplies = document.getElementById('repliesContain')
+let divReplies = document.getElementById('dicetrayReplies')
 
 function getRolls (reply) {
   let rolls = extractRolls(reply)
@@ -132,7 +132,8 @@ function rollToString (roll) {
     reply = `Total du lancé : ${roll.value}<br>`
   }
   else {
-    reply = `D${roll.side} : ${roll.dice} (dé) + ${roll.bonus} (bonus) = ${roll.value}<br>`
+    reply = renderRoll(roll)
+    //reply = `D${roll.side} : ${roll.dice} (dé) + ${roll.bonus} (bonus) = ${roll.value}<br>`
   }
   return reply
 }
@@ -142,7 +143,7 @@ function rollsToString (rolls) {
 }
 
 function inputValidation () {
-  if (inputRoll.value.length <= 0) return false
+  if (inputReply.value.length <= 0) return false
   return true
 }
 
@@ -151,26 +152,24 @@ function setReply (username, reply) {
   reply = rolls.map( rolls => {
     return rolls.map (roll => rollToString(roll))
   })
-  console.log(reply)
   let divReply = document.createElement("div");
-      divReply.className = "rolldice__reply";
-      divReply.innerHTML = `<span class="rolldice__reply-username">${username}</span>
-                         <span class="rolldice__reply-result">${reply}</span>`;
+      divReply.className = "dicetray__reply";
+      divReply.innerHTML = renderReply(reply);
   divReplies.appendChild(divReply)
-  inputRoll.value = ''
+  inputReply.value = ''
 }
 
 /* Events */
 
-buttonRoll.addEventListener("click", (event) => {
+buttonReply.addEventListener("click", (event) => {
   if(inputValidation()) {
-    setReply("khu", inputRoll.value)
+    setReply("khu", inputReply.value)
   }
 });
 
-inputRoll.addEventListener("keydown", (event) => {
+inputReply.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && inputValidation()) {
-    setReply("khu", inputRoll.value)
+    setReply("khu", inputReply.value)
   } 
 });
 
@@ -183,4 +182,24 @@ function showRollsDetails() {
   // La somme = valeur du dé + bonus
   // Sous forme de tableau
   return true
+}
+
+/* Templating */
+
+let renderReply = function (replies) {
+  return `
+    <div class="dicetray__reply-username">Khü</div>
+    <div class="dicetray__reply-rolls">
+      ${replies.join('')}
+    </div>
+  `
+}
+
+let renderRoll = function (roll) {
+  return `
+    <div class="dicetray__roll">
+      <span class="c-side">${roll.side}</span>
+      <span class="c-result"><b>${roll.dice}</b> <small>(dé)</small> + <b>${roll.bonus}</b> <small>(bonus)</small> = <b>${roll.value}</b></span>
+    </div>
+  `
 }

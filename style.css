@@ -1,0 +1,78 @@
+/* LeftSidebar width: 340px */
+
+.sidebar__content {
+  width: 100%;
+  max-width: 340px;
+  height: 100%;
+  padding: 1px;
+  background: #EEE;
+}
+
+/* --- */
+
+.dicetray {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.dicetray__header {
+
+}
+.dicetray__chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dicetray__replies {
+  flex: 1;  
+  max-height: 100%;
+  overflow: auto;
+}
+.dicetray__reply {
+  margin: .35em .25em;
+}
+.dicetray__reply-username {
+  margin: .35em .25em;
+  text-align: right;
+}
+.dicetray__reply-rolls {
+  margin: .35em .25em;
+  padding: .4em;
+  background: #FFF;
+  border: 1px solid #999;
+  border-radius: 3px;
+  line-height: 1.6em;
+}
+.dicetray__roll {
+  display: flex;
+  align-items: center;
+}
+.dicetray__roll > .c-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2em;
+  height: 2em;
+  border: 1px solid #4262ff;
+  border-radius: 3px;
+  margin-right: 1em;
+}
+.dicetray__roll > .c-result {
+  flex: 1;
+}
+.dicetray__roll b {
+  font-weight: normal;
+  color: #4262ff;
+}
+.dicetray__roll small {
+  color: #888;
+}
+.dicetray__form {
+  padding: 1rem 2rem;
+}
+.dicetray__toreply {
+
+}
+
