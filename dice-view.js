@@ -8,10 +8,29 @@
 */
 
 /*
+|| Rendre AllUser
 || Utiliser Class
 || Utiliser TypeScript
 || Utiliser Linter
+|| Utiliser Design
 */
+let currentUser = {}
+
+function getCurrentUser () {
+  var xhr = new XMLHttpRequest();
+
+  xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === this.DONE) {
+      console.log(this.responseText);
+    }
+  });
+
+  xhr.open("GET", "https://api.miro.com/v1/users/me");
+
+  xhr.send(currentUser);
+}
+getCurrentUser()
+console.log(currentUser)
 
 
 /* Elements */
