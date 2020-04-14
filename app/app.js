@@ -1,3 +1,5 @@
+/*coucou*/
+
 var buttonReply = document.getElementById("buttonReply");
 var inputReply = document.getElementById("inputReply");
 var dicetrayReplies = document.getElementById("dicetrayReplies");
