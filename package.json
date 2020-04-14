@@ -1,0 +1,24 @@
+{
+  "name": "miro-dice",
+  "version": "1.0.0",
+  "description": "Plugin  for Miro.com to roll dice",
+  "main": "dice-view.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AilurusWeb/miro-dice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AilurusWeb/miro-dice/issues"
+  },
+  "homepage": "https://github.com/AilurusWeb/miro-dice#readme",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "systemjs": "^6.3.0"
+  }
+}
