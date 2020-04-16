@@ -1,118 +1,129 @@
-var buttonReply = document.getElementById("buttonReply");
-var inputReply = document.getElementById("inputReply");
-var dicetrayReplies = document.getElementById("dicetrayReplies");
-var validInput = function (value) {
-    return (value) ? true : false;
+"use strict";
+const buttonReply = document.getElementById("buttonReply");
+const inputReply = document.getElementById("inputReply");
+let dicetrayReplies = document.getElementById("dicetrayReplies");
+let currentUser = "Khü"; //A remplacer par le retour du serveur Miro
+let validInput = (value) => {
+    const rollRegEx = /(^\d*D\d+){1}\s?(((\+|-)\s?\d+\s?)+$|$)/gi;
+    const splitValue = value.split(" ");
+    for (const elements of splitValue) {
+        if (!elements.match(rollRegEx) || typeof elements !== "string") {
+            return false;
+        }
+    }
+    return true;
 };
-buttonReply.addEventListener("click", function (event) {
-    var value = inputReply.value;
+buttonReply.addEventListener("click", (event) => {
+    let value = inputReply.value;
     if (validInput(value)) {
-        var rolls = new Chat('Khü').submit(value);
+        let rolls = new Chat(currentUser).submit(value);
     }
 });
-inputReply.addEventListener("keydown", function (event) {
-    var value = inputReply.value;
+inputReply.addEventListener("keydown", (event) => {
+    let value = inputReply.value;
     if (event.key === "Enter" && validInput(value)) {
-        var rolls = new Chat('Khü').submit(value);
+        let rolls = new Chat(currentUser).submit(value);
     }
 });
-var Dice = (function () {
-    function Dice(str_dice) {
+/**
+ Classes
+ **/
+class Dice {
+    constructor(str_dice) {
         this._toDice(str_dice);
     }
-    Dice.prototype._toDice = function (str_dice) {
-        var arr = str_dice.match(/\d/gi);
-        var side = (arr.length < 2) ? 1 : parseInt(arr[0]);
-        var value = (arr[1]) ? this._rollDice(parseInt(arr[1])) : this._rollDice(parseInt(arr[0]));
+    _toDice(str_dice) {
+        //Récupération de tous les chiffres du lancer
+        let arr = str_dice.split(/d/gi);
+        let side = (arr.length < 2) ? parseInt(arr[0]) : parseInt(arr[1]);
+        let value = (arr[1]) ? this._rollDice(parseInt(arr[1])) : this._rollDice(parseInt(arr[0]));
         this._dice = {
             side: side,
             value: value,
             toString: str_dice
         };
-    };
-    Dice.prototype._rollDice = function (side) {
+    }
+    _rollDice(side) {
         return Math.floor(Math.random() * side) + 1;
-    };
-    Dice.prototype.dice = function () {
+    }
+    dice() {
         return this._dice;
-    };
-    return Dice;
-}());
-var Modifiers = (function () {
-    function Modifiers(str) {
+    }
+}
+/**
+ *
+ **/
+class Modifiers {
+    constructor(str) {
         this._str = str;
     }
-    Modifiers.prototype.modifiers = function () {
+    modifiers() {
         return {
             sum: this.sum(),
             toString: this._str
         };
-    };
-    Modifiers.prototype.sum = function () {
-        var arr = this._str.match(/(\+\d+)|(\-\d+)/g);
-        var sum = 0;
+    }
+    sum() {
+        let arr = this._str.match(/(\+\d+)|(\-\d+)/g);
+        let sum = 0;
         if (arr === null)
             return 0;
-        for (var _i = 0, arr_1 = arr; _i < arr_1.length; _i++) {
-            var value = arr_1[_i];
+        for (let value of arr) {
             sum += parseInt(value);
         }
         return sum;
-    };
-    return Modifiers;
-}());
-var Rolls = (function () {
-    function Rolls(str_roll) {
+    }
+}
+/**
+ *
+ **/
+class Rolls {
+    constructor(str_roll) {
         this._rolls = [];
-        var rolls = this._extractRolls(str_roll);
-        if (rolls) {
-            for (var _i = 0, rolls_1 = rolls; _i < rolls_1.length; _i++) {
-                var roll = rolls_1[_i];
-                var _a = this._disjoin(roll), str_dices = _a[0], str_modifiers = _a[1];
-                var nb_dices = this._nb_dice(str_dices);
-                var dices = [];
-                var dices_sum = 0;
-                var modifiers = new Modifiers(str_modifiers).modifiers();
-                for (var i = 0; i < nb_dices; i++) {
-                    var dice = new Dice(str_dices).dice();
-                    dices.push(dice);
-                    dices_sum += dice.value;
-                }
-                var r = {
-                    nb_dices: nb_dices,
-                    dices: dices,
-                    modifiers: modifiers,
-                    toString: str_roll,
-                    sum: this._calc(dices_sum, modifiers.sum)
-                };
-                this._rolls.push(r);
+        /*Séparation d'une string de type "1D6 12D6-8" en une liste ["1D6","12D6-8"]*/
+        let rolls = str_roll.split(" ");
+        for (let roll of rolls) {
+            /*      Parcours de la liste rolls et pour chaque élément de la liste :
+                    - Séparation du lancer 1D6 et des modifiers +4-5
+                    - Récupération du nombre de lancer
+                    - Instanciation d'un objet Modifiers renvoyant la somme des modifiers
+            */
+            let [str_dices, str_modifiers] = this._disjoin(roll);
+            let nb_dices = this._nb_dice(str_dices);
+            let dices = [];
+            let dices_sum = 0;
+            let modifiers = new Modifiers(str_modifiers).modifiers();
+            for (let i = 0; i < nb_dices; i++) {
+                /*- Instanciation d'un objet Dice par lancer renvoyant un objet dice comprenant: le type de dé et sa valeur*/
+                let dice = new Dice(str_dices).dice();
+                dices.push(dice);
+                dices_sum += dice.value;
             }
+            /*      - Création d'un objet r comprenant : le nombre de dé, les objets dices, les objets modifiers, la somme de l'ensemble*/
+            let r = {
+                nb_dices: nb_dices,
+                dices: dices,
+                modifiers: modifiers,
+                toString: str_roll,
+                sum: this._calc(dices_sum, modifiers.sum)
+            };
+            this._rolls.push(r);
         }
     }
-    Rolls.prototype.rolls = function () {
+    rolls() {
         return this._rolls;
-    };
-    Rolls.prototype._nb_dice = function (str_dice) {
+    }
+    _nb_dice(str_dice) {
         return parseInt(str_dice.match(/^\d*/)[0]) || 1;
-    };
-    Rolls.prototype._calc = function (dice_value, modifiers_value) {
+    }
+    _calc(dice_value, modifiers_value) {
         return dice_value + modifiers_value;
-    };
-    Rolls.prototype._extractRolls = function (str_rolls) {
-        var words = str_rolls.split(" ");
-        var rolls = [];
-        for (var _i = 0, words_1 = words; _i < words_1.length; _i++) {
-            var word = words_1[_i];
-            if (this._isRoll(word)) {
-                rolls.push(word);
-            }
-        }
-        return (rolls.length) ? rolls : [];
-    };
-    Rolls.prototype._disjoin = function (str_roll) {
-        var regex = /(\+|\-)/g;
-        var index = str_roll.search(regex);
-        var roll = [str_roll, '0'];
+    }
+    /*Fonction permettant de séparer une string de type "1D6+4" en une liste ["1D6","+4"]*/
+    _disjoin(str_roll) {
+        let regex = /(\+|\-)/g;
+        let index = str_roll.search(regex);
+        let roll = [str_roll, '0'];
         if (index !== -1) {
             roll = [
                 str_roll.slice(0, index),
@@ -120,76 +131,70 @@ var Rolls = (function () {
             ];
         }
         return roll;
-    };
-    Rolls.prototype._isRoll = function (word) {
-        if (!this._validChar(word))
-            return false;
-        if (!this._noDuplicateD(word))
-            return false;
-        if (!this._validRollFormat(word))
-            return false;
-        return true;
-    };
-    Rolls.prototype._validChar = function (word) {
-        var accepted = /[^d^\d^\+^\-]/gi;
-        return (word.search(accepted) === -1) ? true : false;
-    };
-    Rolls.prototype._noDuplicateD = function (word) {
-        return (!word.match(/d{2,}/gi)) ? true : false;
-    };
-    Rolls.prototype._validRollFormat = function (word) {
-        var format = /(\d*?D\d+)(((\+|-)\d+)*)?/gi;
-        return (word.match(format)) ? true : false;
-    };
-    return Rolls;
-}());
-var InputStream = (function () {
-    function InputStream(value) {
+    }
+}
+/**
+ *
+ **/
+class InputStream {
+    constructor(value) {
         if (value) {
             this._rolls = new Rolls(value).rolls();
         }
     }
-    InputStream.prototype._reply = function () {
-        var renderRolls = [];
-        var _loop_1 = function (roll) {
-            var modifiers = roll.modifiers;
-            renderRolls = roll.dices.map(function (dice) { return renderRoll(dice, modifiers); });
-        };
-        for (var _i = 0, _a = this._rolls; _i < _a.length; _i++) {
-            var roll = _a[_i];
-            _loop_1(roll);
+    _reply() {
+        /*Création d'une liste affichant les différents lancer*/
+        let renderRolls = [];
+        /*Pour chaque lancer récupération de l'objet contenant un ModifierSchema et une liste de DiceSchema*/
+        for (let roll of this._rolls) {
+            let modifiers = roll.modifiers;
+            /*Récupération de la liste des DiceSchema et implémentation de l'affichage(DiceSchema, ModifierSchema) renderRollss*/
+            for (let dice of roll.dices) {
+                renderRolls.push(renderRoll(dice, modifiers));
+            }
         }
         return renderReply(renderRolls);
-    };
-    InputStream.prototype.render = function () {
-        var divReply = document.createElement("div");
+    }
+    render() {
+        let divReply = document.createElement("div");
         divReply.className = "dicetray__reply";
         divReply.innerHTML = this._reply();
         dicetrayReplies.appendChild(divReply);
         inputReply.value = '';
-    };
-    return InputStream;
-}());
-var Chat = (function () {
-    function Chat(sender) {
     }
-    Chat.prototype._insertReply = function () {
-    };
-    Chat.prototype.submit = function (str) {
+}
+/**
+ *
+ **/
+class Chat {
+    constructor(sender) {
+    }
+    _insertReply() {
+    }
+    submit(str) {
         return new InputStream(str).render();
-    };
-    return Chat;
-}());
-var renderReply = function (replies) {
-    return "\n    <div class=\"dicetray__reply-username\">Kh\u00FC</div>\n    <div class=\"dicetray__reply-rolls\">\n      " + replies.join('') + "\n    </div>\n  ";
+    }
+}
+/* Templating */
+let renderReply = function (replies) {
+    return `
+    <div class="dicetray__reply-username">${currentUser}</div>
+    <div class="dicetray__reply-rolls">
+      ${replies.join('')}
+    </div>
+  `;
 };
-var renderRoll = function (dice, modifiers) {
-    var roll = {
+let renderRoll = function (dice, modifiers) {
+    let roll = {
         side: dice.side,
         dice: dice.value,
         bonus: modifiers.sum,
-        sum: dice.value + modifiers.sum
+        sum: dice.value + modifiers.sum,
     };
-    return "\n    <div class=\"dicetray__roll\">\n      <span class=\"c-side\">" + roll.side + "</span>\n      <span class=\"c-result\"><b>" + roll.dice + "</b> <small>(d\u00E9)</small> + <b>" + roll.bonus + "</b> <small>(bonus)</small> = <b>" + roll.sum + "</b></span>\n    </div>\n  ";
+    return `
+    <div class="dicetray__roll">
+      <span class="c-side">${roll.side}</span>
+      <span class="c-result"><b>${roll.dice}</b> <small>(dé)</small> + <b>${roll.bonus}</b> <small>(bonus)</small> = <b>${roll.sum}</b></span>
+    </div>
+  `;
 };
-//# sourceMappingURL=app.js.map
